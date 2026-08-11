@@ -1,4 +1,3 @@
-```yaml
 name: Build Saiguu Kernel
 
 on:
@@ -153,4 +152,3 @@ jobs:
           path: build.log
           if-no-files-found: warn
           retention-days: 14
-```
