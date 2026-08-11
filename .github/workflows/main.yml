@@ -180,20 +180,20 @@ jobs:
           ls -lah
 
           zip -r9 \
-            "../Saiguu-AnyKernel3-${GITHUB_SHA}.zip" \
+            "../Saiguu-Kernel-${GITHUB_SHA}.zip" \
             * \
             -x .git README.md '*placeholder'
 
           cd ..
 
           echo "=== Final package ==="
-          ls -lh "Saiguu-AnyKernel3-${GITHUB_SHA}.zip"
+          ls -lh "Saiguu-Kernel-${GITHUB_SHA}.zip"
 
       - name: Upload AnyKernel3 package
         uses: actions/upload-artifact@v4
         with:
-          name: Saiguu-AnyKernel3-${{ github.sha }}
-          path: Saiguu-AnyKernel3-${{ github.sha }}.zip
+          name: Saiguu-Kernel-${{ github.sha }}
+          path: Saiguu-Kernel-${{ github.sha }}.zip
           if-no-files-found: error
           retention-days: 30
 
@@ -202,18 +202,6 @@ jobs:
         run: |
           echo "=== Kernel output ==="
           ls -lah out/arch/arm64/boot/ || true
-
-      - name: Upload kernel image
-        uses: actions/upload-artifact@v4
-        with:
-          name: Saiguu-kernel-${{ github.sha }}
-          path: |
-            out/arch/arm64/boot/Image
-            out/arch/arm64/boot/Image.gz
-            out/arch/arm64/boot/Image.gz-dtb
-            out/arch/arm64/boot/dts/
-          if-no-files-found: warn
-          retention-days: 14
 
       - name: Upload build log
         if: always()
