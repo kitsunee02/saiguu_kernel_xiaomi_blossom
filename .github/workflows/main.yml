@@ -109,6 +109,93 @@ jobs:
             CROSS_COMPILE="${CROSS_COMPILE}" \
             CROSS_COMPILE_ARM32="${CROSS_COMPILE_ARM32}" \
             2>&1 | tee build.log
+            
+      - name: Package AnyKernel3
+        run: |
+          set -e
+
+          echo "=== Cloning AnyKernel ==="
+          git clone --depth=1 \
+            https://github.com/Iam-nishan/anykernel.git \
+            anykernel
+
+          echo "=== Kernel output ==="
+          ls -lah out/arch/arm64/boot/
+
+          cd anykernel
+
+          rm -f Image Image.gz Image.gz-dtb zImage *.dtb *.dtb.img
+
+          if [ -f "../out/arch/arm64/boot/Image.gz-dtb" ]; then
+            cp ../out/arch/arm64/boot/Image.gz-dtb Image.gz-dtb
+            echo "Using Image.gz-dtb"
+
+          elif [ -f "../out/arch/arm64/boot/Image.gz" ]; then
+            cp ../out/arch/arm64/boot/Image.gz Image.gz
+            echo "Using Image.gz"
+
+          elif [ -f "../out/arch/arm64/boot/Image" ]; then
+            cp ../out/arch/arm64/boot/Image Image
+            echo "Using Image"
+
+          else
+            echo "ERROR: No kernel image found"
+            exit 1
+          fi
+
+          for dtb in ../out/arch/arm64/boot/*.dtb; do
+            if [ -f "$dtb" ]; then
+              cp "$dtb" .
+              echo "Copied $(basename "$dtb")"
+            fi
+          done
+
+          cat > anykernel.sh << 'EOF'
+          properties() { '
+          kernel.string=Saiguu Kernel for blossom
+          do.devicecheck=1
+          device.name1=blossom
+          device.name2=dandelion
+          device.name3=angelica
+          device.name4=angelican
+          device.name5=cattail
+          device.name6=angelicain
+          do.modules=0
+          do.systemless=1
+          do.cleanup=1
+          do.cleanuponabort=0
+          '; }
+
+          block=/dev/block/by-name/boot;
+          is_slot_device=0;
+          ramdisk_compression=auto;
+
+          . tools/ak3-core.sh;
+
+          dump_boot;
+          write_boot;
+          EOF
+
+          echo "=== AnyKernel contents ==="
+          ls -lah
+
+          zip -r9 \
+            "../Saiguu-AnyKernel3-${GITHUB_SHA}.zip" \
+            * \
+            -x .git README.md '*placeholder'
+
+          cd ..
+
+          echo "=== Final package ==="
+          ls -lh "Saiguu-AnyKernel3-${GITHUB_SHA}.zip"
+
+      - name: Upload AnyKernel3 package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Saiguu-AnyKernel3-${{ github.sha }}
+          path: Saiguu-AnyKernel3-${{ github.sha }}.zip
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Show kernel output
         if: always()
