@@ -179,7 +179,7 @@ jobs:
           echo "=== AnyKernel contents ==="
           ls -lah
 
-          zip -r9 \
+         # zip -r9 \
             "../Saiguu-Kernel-${GITHUB_SHA}.zip" \
             * \
             -x .git README.md '*placeholder'
