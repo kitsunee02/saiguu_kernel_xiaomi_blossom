@@ -190,13 +190,14 @@ jobs:
           ls -lh "Saiguu-Kernel-${GITHUB_SHA}.zip"
 
       - name: Upload AnyKernel3 package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Saiguu-Kernel-${{ github.sha }}
           path: Saiguu-Kernel-${{ github.sha }}.zip
           archive: false
           if-no-files-found: error
           retention-days: 30
+          compression-level: 0
 
       - name: Show kernel output
         if: always()
